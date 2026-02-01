@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String   @id @default(uuid())
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
   email             String   @unique
   password          String?
   name              String?
@@ -20,8 +20,8 @@ model User {
 }
 
 model Meeting {
-  id                String   @id @default(uuid())
-  userId            String
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
   user              User     @relation(fields: [userId], references: [id])
   
   googleEventId     String?  @unique
@@ -51,8 +51,8 @@ enum MeetingStatus {
 }
 
 model Recording {
-  id          String   @id @default(uuid())
-  meetingId   String   @unique
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  meetingId   String   @unique @db.ObjectId
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
   s3Key       String
@@ -62,21 +62,21 @@ model Recording {
 }
 
 model Transcript {
-  id          String   @id @default(uuid())
-  meetingId   String   @unique
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  meetingId   String   @unique @db.ObjectId
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
-  fullText    String   @db.Text
+  fullText    String
   
   createdAt   DateTime @default(now())
 }
 
 model Summary {
-  id          String   @id @default(uuid())
-  meetingId   String   @unique
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  meetingId   String   @unique @db.ObjectId
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
-  content     String   @db.Text
+  content     String
   
   createdAt   DateTime @default(now())
 }
