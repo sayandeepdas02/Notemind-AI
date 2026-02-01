@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+.turbo
+js-output
+coverage
+.env
+.DS_Store

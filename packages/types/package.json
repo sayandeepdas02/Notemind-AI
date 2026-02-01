@@ -1,0 +1,14 @@
+{
+    "name": "@notemind/types",
+    "version": "0.0.0",
+    "private": true,
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "devDependencies": {
+        "@notemind/config": "workspace:*",
+        "zod": "^3.0.0"
+    },
+    "dependencies": {
+        "zod": "^3.0.0"
+    }
+}

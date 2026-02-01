@@ -1,0 +1,6 @@
+{
+    "extends": "@notemind/config/tsconfig.json",
+    "include": [
+        "src/**/*"
+    ]
+}

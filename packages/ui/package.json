@@ -1,0 +1,26 @@
+{
+    "name": "@notemind/ui",
+    "version": "0.0.0",
+    "private": true,
+    "main": "src/index.tsx",
+    "types": "src/index.tsx",
+    "peerDependencies": {
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0"
+    },
+    "devDependencies": {
+        "@notemind/config": "workspace:*",
+        "@types/react": "^18.0.0",
+        "@types/react-dom": "^18.0.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@radix-ui/react-slot": "^1.2.4",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.563.0",
+        "tailwind-merge": "^3.4.0"
+    }
+}
