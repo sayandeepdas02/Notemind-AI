@@ -18,7 +18,7 @@ export function Navbar() {
                     <Link href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
                 </div>
                 <div className="flex items-center gap-4">
-                    <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hidden sm:block">Sign In</Link>
+                    <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors hidden sm:block">Sign in</Link>
                     <Button size="sm" className="rounded-full px-5 font-medium" asChild>
                         <Link href="/signup">Get Started</Link>
                     </Button>

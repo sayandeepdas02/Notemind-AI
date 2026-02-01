@@ -10,10 +10,10 @@ export function Features() {
                         <span className="text-primary font-bold uppercase tracking-widest text-[10px]">Benefits</span>
                     </div>
                     <h2 className="text-4xl font-serif font-medium tracking-tight text-gray-900 sm:text-5xl">
-                        Smarter workflows, zero friction
+                        Smarter meetings, zero friction
                     </h2>
                     <p className="mt-6 text-lg text-gray-600 font-sans">
-                        From automation to insights, everything works seamlessly in the background.
+                        From recording to insights, everything works seamlessly in the background.
                     </p>
                 </div>
 
@@ -25,7 +25,7 @@ export function Features() {
                         </div>
                         <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Autonomous Execution</h3>
                         <p className="text-gray-600 font-sans leading-relaxed text-base">
-                            Runs without manual input — AI handles workflows end-to-end.
+                            Notemind joins meetings and captures notes automatically — no manual input required.
                         </p>
                     </div>
 
@@ -36,7 +36,7 @@ export function Features() {
                         </div>
                         <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Seamless Integration</h3>
                         <p className="text-gray-600 font-sans leading-relaxed text-base">
-                            Works with your tools: Slack, Gmail, Calendar, and more.
+                            Works effortlessly with Google Meet and Google Calendar.
                         </p>
                     </div>
 
@@ -47,7 +47,7 @@ export function Features() {
                         </div>
                         <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Real-Time Insights</h3>
                         <p className="text-gray-600 font-sans leading-relaxed text-base">
-                            Summaries and updates delivered instantly, no bottlenecks.
+                            Summaries and transcripts are generated minutes after each meeting.
                         </p>
                     </div>
 
@@ -58,7 +58,7 @@ export function Features() {
                         </div>
                         <h3 className="text-2xl font-serif font-medium text-gray-900 mb-3">Scalable Performance</h3>
                         <p className="text-gray-600 font-sans leading-relaxed text-base">
-                            From small teams to enterprises — built to grow with you.
+                            Built for individuals, teams, and growing organizations.
                         </p>
                     </div>
                 </div>

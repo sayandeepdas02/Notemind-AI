@@ -19,23 +19,23 @@ export function Testimonials() {
                             </div>
                         </div>
                         <blockquote className="text-2xl font-serif leading-relaxed text-gray-900 font-medium">
-                            “Notemind has completely changed the way we work. Tasks that used to pile up and slow us down are now handled automatically. It’s like having an extra team member working around the clock.”
+                            “The automation feels invisible yet powerful. Notemind keeps everything on track so we can focus on the bigger picture.”
                         </blockquote>
                         <div>
-                            <div className="font-bold text-sm text-gray-900 uppercase tracking-wide">Abraham John</div>
-                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Product Manager, Flowops</div>
+                            <div className="font-bold text-sm text-gray-900 uppercase tracking-wide">Trevor James</div>
+                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Project Lead, Gloops</div>
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-6 md:mt-24">
                         <blockquote className="text-2xl font-serif leading-relaxed text-gray-900 font-medium">
-                            “The automation feels invisible yet powerful. Notemind quietly keeps everything on track so we can focus on the bigger picture. Our team is already loving it.”
+                            “Notemind has completely changed the way we work. It’s like having an extra team member in every meeting.”
                         </blockquote>
                         <div className="flex items-center gap-4">
                             <div className="h-12 w-12 bg-gray-200 rounded-full" />
                             <div>
-                                <div className="font-bold text-sm text-gray-900 uppercase tracking-wide">Trevor James</div>
-                                <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Project Lead, Gloops</div>
+                                <div className="font-bold text-sm text-gray-900 uppercase tracking-wide">Abraham John</div>
+                                <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Product Manager, FlowOps</div>
                             </div>
                         </div>
                     </div>

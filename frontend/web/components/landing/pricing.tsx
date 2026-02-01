@@ -27,14 +27,14 @@ export function Pricing() {
                                 <span className="text-4xl font-serif font-medium text-gray-900">$19</span>
                                 <span className="text-sm font-medium text-gray-500">/mo</span>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2 font-sans">For individuals looking to automate their daily tasks.</p>
+                            <p className="text-sm text-gray-500 mt-2 font-sans">For individuals getting started with automated meeting notes.</p>
                         </CardHeader>
                         <CardContent className="flex-1 flex flex-col pt-0">
                             <Button variant="outline" className="w-full border-gray-200 mt-4 mb-8">Get Started</Button>
                             <ul className="space-y-3 text-sm text-gray-600 flex-1">
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> 100 tasks / month</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Email automation</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Meeting summaries</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> AI meeting summaries</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Full meeting transcripts</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Google Calendar integration</li>
                                 <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Basic support</li>
                             </ul>
                         </CardContent>
@@ -48,15 +48,15 @@ export function Pricing() {
                                 <span className="text-4xl font-serif font-medium text-gray-900">$39</span>
                                 <span className="text-sm font-medium text-gray-500">/mo</span>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2 font-sans">For fast-moving teams ready to offload the busywork.</p>
+                            <p className="text-sm text-gray-500 mt-2 font-sans">For fast-moving teams that want deeper insights.</p>
                         </CardHeader>
                         <CardContent className="flex-1 flex flex-col pt-0">
                             <Button className="w-full bg-primary hover:bg-primary/90 text-white mt-4 mb-8">Get Started</Button>
                             <ul className="space-y-3 text-sm text-gray-600 flex-1">
                                 <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Everything in Starter</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> 1,000 tasks / month</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Priority email automation</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Advanced meeting summaries</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Priority processing</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Advanced summaries</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-primary" /> Team collaboration features</li>
                             </ul>
                         </CardContent>
                     </Card>
@@ -69,15 +69,15 @@ export function Pricing() {
                                 <span className="text-4xl font-serif font-medium text-gray-900">$99</span>
                                 <span className="text-sm font-medium text-gray-500">/mo</span>
                             </div>
-                            <p className="text-sm text-gray-500 mt-2 font-sans">For large teams and organizations that need scale and security.</p>
+                            <p className="text-sm text-gray-500 mt-2 font-sans">For organizations that need scale, security, and control.</p>
                         </CardHeader>
                         <CardContent className="flex-1 flex flex-col pt-0">
                             <Button variant="outline" className="w-full border-gray-200 mt-4 mb-8">Get Started</Button>
                             <ul className="space-y-3 text-sm text-gray-600 flex-1">
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Everything in Pro</li>
-                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Unlimited tasks / month</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Unlimited meetings</li>
                                 <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Dedicated account manager</li>
                                 <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Custom integrations</li>
+                                <li className="flex gap-2 items-center"><div className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Advanced security controls</li>
                             </ul>
                         </CardContent>
                     </Card>

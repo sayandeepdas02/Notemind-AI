@@ -26,21 +26,25 @@ export default function Home() {
                 <Testimonials />
 
                 {/* Final CTA Section */}
-                <section className="bg-gray-900 py-24 sm:py-32 relative overflow-hidden">
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-                        <div className="max-w-2xl">
-                            <h2 className="text-4xl font-serif font-medium tracking-tight text-white sm:text-5xl mb-6">
-                                Work smarter, not harder with Notemind
+                <section className="relative py-24 sm:py-32 bg-orange-50/50 overflow-hidden">
+                    <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.orange.100),white)] opacity-20" />
+                    <div className="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-orange-600/10 ring-1 ring-orange-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center" />
+
+                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <div className="mx-auto max-w-2xl text-center">
+                            <h2 className="text-3xl font-serif font-medium tracking-tight text-gray-900 sm:text-4xl">
+                                Never take meeting notes again
                             </h2>
-                            <p className="text-lg text-gray-400 mb-10 max-w-xl">
-                                Start automating tasks today and give your team more time to focus on what matters.
+                            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
+                                Let Notemind handle the details — so you can focus on the conversation.
                             </p>
-                            <Button size="lg" className="rounded-md px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium text-base shadow-sm" asChild>
-                                <Link href="/login">Request a demo</Link>
-                            </Button>
+                            <div className="mt-10 flex items-center justify-center gap-x-6">
+                                <Button size="lg" className="rounded-md px-8 h-12 bg-primary hover:bg-primary/90 text-white font-medium text-base shadow-sm" asChild>
+                                    <Link href="/signup">Get Started</Link>
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                    <div className="absolute top-0 right-0 -mr-24 -mt-24 h-[500px] w-[500px] rounded-full bg-gray-800/20 blur-3xl pointer-events-none"></div>
                 </section>
 
             </main>
