@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                String   @id @default(uuid())
   email             String   @unique
   password          String?
   name              String?
@@ -20,8 +20,8 @@ model User {
 }
 
 model Meeting {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String   @db.ObjectId
+  id                String   @id @default(uuid())
+  userId            String
   user              User     @relation(fields: [userId], references: [id])
   
   googleEventId     String?  @unique
@@ -31,7 +31,7 @@ model Meeting {
   startTime         DateTime
   endTime           DateTime?
   
-  status            MeetingStatus @default(SCHEDULED)
+  status            String   @default("SCHEDULED")
   
   recording         Recording?
   transcript        Transcript?
@@ -41,18 +41,9 @@ model Meeting {
   updatedAt         DateTime @updatedAt
 }
 
-enum MeetingStatus {
-  SCHEDULED
-  JOINING
-  RECORDING
-  PROCESSING
-  COMPLETED
-  FAILED
-}
-
 model Recording {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  meetingId   String   @unique @db.ObjectId
+  id          String   @id @default(uuid())
+  meetingId   String   @unique
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
   s3Key       String
@@ -62,8 +53,8 @@ model Recording {
 }
 
 model Transcript {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  meetingId   String   @unique @db.ObjectId
+  id          String   @id @default(uuid())
+  meetingId   String   @unique
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
   fullText    String
@@ -72,8 +63,8 @@ model Transcript {
 }
 
 model Summary {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  meetingId   String   @unique @db.ObjectId
+  id          String   @id @default(uuid())
+  meetingId   String   @unique
   meeting     Meeting  @relation(fields: [meetingId], references: [id])
   
   content     String

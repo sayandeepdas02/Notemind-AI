@@ -1,12 +1,9 @@
 import express, { Router } from "express";
-import { oauth2Client, SCOPES } from "../../config/auth";
 import { prisma } from "@notemind/db";
-import { google } from "googleapis";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { authenticateToken, generateToken, AuthRequest } from "../../middleware/auth";
 
 const router: Router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 // POST /auth/signup
 router.post("/signup", async (req, res) => {
@@ -31,12 +28,11 @@ router.post("/signup", async (req, res) => {
             },
         });
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
-
+        const token = generateToken(user.id, user.email);
         res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
     } catch (error) {
         console.error("Signup Error:", error);
-        res.status(500).json({ error: error instanceof Error ? error.message : "Internal Server Error" });
+        res.status(500).json({ error: "Failed to create account" });
     }
 });
 
@@ -59,75 +55,66 @@ router.post("/signin", async (req, res) => {
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
-
+        const token = generateToken(user.id, user.email);
         res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
     } catch (error) {
         console.error("Signin Error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Failed to sign in" });
     }
 });
 
-// GET /auth/google
-// Redirects user to Google Consent Screen
-router.get("/google", (req, res) => {
-    const authUrl = oauth2Client.generateAuthUrl({
-        access_type: "offline", // Required to get refresh_token
-        scope: SCOPES,
-        prompt: "consent" // Force consent to ensure we get a refresh token
-    });
-    res.redirect(authUrl);
+// GET /auth/me - Get current user
+router.get("/me", authenticateToken, async (req: AuthRequest, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.userId },
+            select: { id: true, email: true, name: true, createdAt: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error("Get User Error:", error);
+        res.status(500).json({ error: "Failed to get user" });
+    }
 });
 
-// GET /auth/google/callback
-// Exchanges code for tokens and creates/updates user
-router.get("/google/callback", async (req, res) => {
-    const { code } = req.query;
+// PUT /auth/password - Change password
+router.put("/password", authenticateToken, async (req: AuthRequest, res) => {
+    const { currentPassword, newPassword } = req.body;
 
-    if (!code || typeof code !== 'string') {
-        return res.status(400).send("Missing code parameter");
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current and new passwords are required" });
+    }
+
+    if (newPassword.length < 6) {
+        return res.status(400).json({ error: "New password must be at least 6 characters" });
     }
 
     try {
-        // Exchange code for tokens
-        const { tokens } = await oauth2Client.getToken(code);
-        oauth2Client.setCredentials(tokens);
-
-        // Get User Info
-        const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
-        const userInfo = await oauth2.userinfo.get();
-
-        const email = userInfo.data.email;
-        const name = userInfo.data.name;
-
-        if (!email) {
-            return res.status(400).send("No email found in Google Profile");
+        const user = await prisma.user.findUnique({ where: { id: req.userId } });
+        if (!user || !user.password) {
+            return res.status(404).json({ error: "User not found" });
         }
 
-        // Upsert User in DB
-        const user = await prisma.user.upsert({
-            where: { email },
-            update: {
-                googleRefreshToken: tokens.refresh_token || undefined, // Only update if we go a new one
-                name: name || undefined
-            },
-            create: {
-                email,
-                name: name || "Unknown User",
-                googleRefreshToken: tokens.refresh_token
-            }
+        const validPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!validPassword) {
+            return res.status(401).json({ error: "Current password is incorrect" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await prisma.user.update({
+            where: { id: req.userId },
+            data: { password: hashedPassword }
         });
 
-        // In a real app, set a secure HTTP-only session cookie here.
-        // For MVP, we'll just redirect to dashboard with a query param (Not Secure, but simple)
-        // OR better: Return a simple success page or JSON
-
-        // Let's redirect to frontend Dashboard
-        res.redirect(`http://localhost:3000/dashboard?userId=${user.id}`);
-
+        res.json({ message: "Password updated successfully" });
     } catch (error) {
-        console.error("Auth Error:", error);
-        res.status(500).send("Authentication Failed");
+        console.error("Password Change Error:", error);
+        res.status(500).json({ error: "Failed to change password" });
     }
 });
 

@@ -19,9 +19,11 @@ app.use(express.json());
 
 import authRoutes from "./modules/auth/routes";
 import calendarRoutes from "./modules/calendar/routes";
+import meetingsRoutes from "./modules/meetings/routes";
 
 app.use("/auth", authRoutes);
 app.use("/calendar", calendarRoutes);
+app.use("/meetings", meetingsRoutes);
 
 app.get("/", (req, res) => {
     res.json({ message: "Notemind API is running" });
