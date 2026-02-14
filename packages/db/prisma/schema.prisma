@@ -34,8 +34,8 @@ model Meeting {
   status            String   @default("SCHEDULED")
   
   recording         Recording?
-  transcript        Transcript?
-  summary           Summary?
+  transcript        String?  // Stored as text directly
+  summary           String?  // Stored as text directly
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -48,26 +48,6 @@ model Recording {
   
   s3Key       String
   durationSec Int?
-  
-  createdAt   DateTime @default(now())
-}
-
-model Transcript {
-  id          String   @id @default(uuid())
-  meetingId   String   @unique
-  meeting     Meeting  @relation(fields: [meetingId], references: [id])
-  
-  fullText    String
-  
-  createdAt   DateTime @default(now())
-}
-
-model Summary {
-  id          String   @id @default(uuid())
-  meetingId   String   @unique
-  meeting     Meeting  @relation(fields: [meetingId], references: [id])
-  
-  content     String
   
   createdAt   DateTime @default(now())
 }

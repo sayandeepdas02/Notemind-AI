@@ -2,8 +2,78 @@ import express, { Router } from "express";
 import { prisma } from "@notemind/db";
 import bcrypt from "bcryptjs";
 import { authenticateToken, generateToken, AuthRequest } from "../../middleware/auth";
+import { oauth2Client, SCOPES } from "../../config/auth";
+import { google } from "googleapis";
 
 const router: Router = express.Router();
+
+// GET /auth/google
+router.get("/google", (req, res) => {
+    const authUrl = oauth2Client.generateAuthUrl({
+        access_type: "offline", // Required for refresh_token
+        scope: SCOPES,
+        prompt: "consent" // Force to get refresh_token
+    });
+    res.redirect(authUrl);
+});
+
+// GET /auth/google/callback
+router.get("/google/callback", async (req, res) => {
+    const { code } = req.query;
+
+    if (!code) {
+        return res.status(400).json({ error: "Missing code" });
+    }
+
+    try {
+        const { tokens } = await oauth2Client.getToken(code as string);
+        oauth2Client.setCredentials(tokens);
+
+        const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
+        const userInfo = await oauth2.userinfo.get();
+
+        if (!userInfo.data.email) {
+            return res.status(400).json({ error: "Google account has no email" });
+        }
+
+        const email = userInfo.data.email;
+        const name = userInfo.data.name || "User";
+        const googleRefreshToken = tokens.refresh_token;
+
+        // Find or Create User
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user) {
+            // Create user
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    name,
+                    googleRefreshToken // Store refresh token
+                }
+            });
+        } else if (googleRefreshToken) {
+            // Update refresh token if we got a new one
+            user = await prisma.user.update({
+                where: { id: user.id },
+                data: { googleRefreshToken }
+            });
+        }
+
+        // Generate JWT
+        const token = generateToken(user.id, user.email);
+
+        // Redirect to frontend with token
+        // In a real app, uses a secure cookie or a temporary code.
+        // For MVP, passing via query param to specific frontend route.
+        // Assuming frontend is http://localhost:3000
+        res.redirect(`http://localhost:3000/login?token=${token}`);
+
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        res.status(500).json({ error: "Authentication failed" });
+    }
+});
 
 // POST /auth/signup
 router.post("/signup", async (req, res) => {

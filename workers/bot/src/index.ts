@@ -1,46 +1,66 @@
 import { Worker } from "bullmq";
-import { chromium } from "playwright";
+import { prisma } from "@notemind/db";
+import IORedis from "ioredis";
 
 console.log("Bot Service Starting...");
+
+const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
+    maxRetriesPerRequest: null,
+});
 
 const worker = new Worker(
     "meeting-jobs",
     async (job) => {
         console.log(`[Bot] Processing job ${job.id}: ${job.name}`);
-        const { meetingUrl } = job.data;
+        const { meetingId, meetLink } = job.data;
 
         try {
-            console.log(`[Bot] Launching Browser for ${meetingUrl}...`);
-
-            const browser = await chromium.launch({
-                headless: true,
-                args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] // Mock permissions
+            // 1. Update status to RUNNING
+            await prisma.meeting.update({
+                where: { id: meetingId },
+                data: { status: "RUNNING" }
             });
-            const context = await browser.newContext({ permissions: ["microphone"] });
-            const page = await context.newPage();
+            console.log(`[Bot] Meeting ${meetingId} status -> RUNNING`);
 
-            console.log(`[Bot] Navigating to ${meetingUrl}...`);
-            await page.goto(meetingUrl);
+            // 2. Simulate Bot Work
+            console.log(`[Bot] Joining ${meetLink}...`);
+            await new Promise((resolve) => setTimeout(resolve, 5000)); // 5s mock delay
 
-            // Simulate "Working"
-            console.log("[Bot] In Lobby, waiting...");
-            await new Promise((resolve) => setTimeout(resolve, 5000)); // Fake 5s wait
+            const mockTranscript = `
+Speaker 1: Welcome everyone to the weekly sync.
+Speaker 2: Thanks! I have updates on the frontend.
+Speaker 1: Great, let's hear them.
+Speaker 2: The dashboard is now responsive and connects to the API.
+Speaker 1: Awesome work. Meeting adjourned.
+            `.trim();
 
-            console.log("[Bot] Meeting Simulation Complete.");
-            await browser.close();
+            const mockSummary = "The team discussed the frontend progress. The dashboard is now responsive and API integrated.";
 
-            return { status: "SUCCESS", recordingUrl: "s3://mock-bucket/audio.webm" };
-        } catch (error) {
-            console.error(`[Bot] Failed to join ${meetingUrl}`, error);
+            // 3. Save Results & Complete
+            await prisma.meeting.update({
+                where: { id: meetingId },
+                data: {
+                    status: "COMPLETED",
+                    transcript: mockTranscript,
+                    summary: mockSummary
+                }
+            });
+            console.log(`[Bot] Meeting ${meetingId} status -> COMPLETED`);
+
+            return { status: "SUCCESS" };
+
+        } catch (error: any) {
+            console.error(`[Bot] Job failed for meeting ${meetingId}`, error);
+
+            await prisma.meeting.update({
+                where: { id: meetingId },
+                data: { status: "FAILED" }
+            });
+
             throw error;
         }
     },
-    {
-        connection: {
-            host: process.env.REDIS_HOST || "localhost",
-            port: parseInt(process.env.REDIS_PORT || "6379"),
-        },
-    }
+    { connection }
 );
 
 worker.on("completed", (job) => {

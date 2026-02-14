@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import { prisma } from "@notemind/db";
 import { authenticateToken, AuthRequest } from "../../middleware/auth";
+import { meetingQueue } from "../../transcription/queue";
 
 const router: Router = express.Router();
 
@@ -9,10 +10,6 @@ router.get("/", authenticateToken, async (req: AuthRequest, res) => {
     try {
         const meetings = await prisma.meeting.findMany({
             where: { userId: req.userId },
-            include: {
-                transcript: { select: { id: true } },
-                summary: { select: { id: true } }
-            },
             orderBy: { startTime: "desc" }
         });
 
@@ -44,13 +41,19 @@ router.post("/", authenticateToken, async (req: AuthRequest, res) => {
                 joinUrl: meetingUrl,
                 title: title || "Untitled Meeting",
                 startTime: new Date(),
-                status: "SCHEDULED"
+                status: "PENDING" // Initial status
             }
+        });
+
+        // Add to queue
+        await meetingQueue.add("join-meeting", {
+            meetingId: meeting.id,
+            meetLink: meetingUrl
         });
 
         res.json({
             meeting,
-            message: "Notetaker will join when admitted to the meeting"
+            message: "Notetaker scheduled to join"
         });
     } catch (error) {
         console.error("Create Meeting Error:", error);
@@ -68,10 +71,6 @@ router.get("/:id", authenticateToken, async (req: AuthRequest, res) => {
                 id,
                 userId: req.userId
             },
-            include: {
-                transcript: true,
-                summary: true
-            }
         });
 
         if (!meeting) {

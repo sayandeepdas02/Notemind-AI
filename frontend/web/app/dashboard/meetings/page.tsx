@@ -9,9 +9,9 @@ interface Meeting {
     title: string;
     joinUrl: string;
     startTime: string;
-    status: string;
-    transcript?: { id: string };
-    summary?: { id: string };
+    status: "SCHEDULED" | "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
+    transcript?: string;
+    summary?: string;
 }
 
 export default function MyMeetingsPage() {
@@ -23,12 +23,22 @@ export default function MyMeetingsPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
 
+    // Initial fetch
     useEffect(() => {
         fetchMeetings();
     }, []);
 
-    const fetchMeetings = async () => {
+    // Polling every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchMeetings(false); // Silent refresh
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const fetchMeetings = async (showLoading = true) => {
         try {
+            if (showLoading) setIsLoading(true);
             const token = localStorage.getItem("token");
             const res = await fetch("http://localhost:5001/meetings", {
                 headers: { Authorization: `Bearer ${token}` }
@@ -40,7 +50,7 @@ export default function MyMeetingsPage() {
         } catch (err) {
             console.error("Failed to fetch meetings:", err);
         } finally {
-            setIsLoading(false);
+            if (showLoading) setIsLoading(false);
         }
     };
 
@@ -87,6 +97,16 @@ export default function MyMeetingsPage() {
         });
     };
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "COMPLETED": return "bg-green-100 text-green-700";
+            case "RUNNING": return "bg-blue-100 text-blue-700";
+            case "FAILED": return "bg-red-100 text-red-700";
+            case "PENDING": return "bg-gray-100 text-gray-700";
+            default: return "bg-yellow-100 text-yellow-700";
+        }
+    };
+
     return (
         <>
             <div className="flex items-center justify-between">
@@ -129,12 +149,7 @@ export default function MyMeetingsPage() {
                             <CardHeader className="pb-2">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-base">{meeting.title}</CardTitle>
-                                    <span className={`text-xs px-2 py-1 rounded-full ${meeting.status === "COMPLETED"
-                                            ? "bg-green-100 text-green-700"
-                                            : meeting.status === "RECORDING"
-                                                ? "bg-red-100 text-red-700"
-                                                : "bg-yellow-100 text-yellow-700"
-                                        }`}>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(meeting.status)}`}>
                                         {meeting.status}
                                     </span>
                                 </div>
@@ -156,17 +171,17 @@ export default function MyMeetingsPage() {
                                     </a>
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    {meeting.transcript && (
-                                        <Button variant="outline" size="sm">
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            View Transcript
-                                        </Button>
-                                    )}
-                                    {meeting.summary && (
-                                        <Button variant="outline" size="sm">
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            View Summary
-                                        </Button>
+                                    {meeting.status === "COMPLETED" && (
+                                        <>
+                                            <Button variant="outline" size="sm" onClick={() => alert(meeting.transcript || "No transcript available")}>
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                View Transcript
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => alert(meeting.summary || "No summary available")}>
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                View Summary
+                                            </Button>
+                                        </>
                                     )}
                                 </div>
                             </CardContent>
