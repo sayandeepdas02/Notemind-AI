@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@notemind/ui";
 import { Plus, Calendar, Video, FileText, Clock, ExternalLink } from "lucide-react";
+import { MeetingDetails } from "@/components/meeting-details/MeetingDetails";
 
 interface Meeting {
     id: string;
@@ -22,6 +23,9 @@ export default function MyMeetingsPage() {
     const [meetingTitle, setMeetingTitle] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
+    const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
 
     // Initial fetch
     useEffect(() => {
@@ -172,16 +176,13 @@ export default function MyMeetingsPage() {
                                 </div>
                                 <div className="flex gap-2 mt-4">
                                     {meeting.status === "COMPLETED" && (
-                                        <>
-                                            <Button variant="outline" size="sm" onClick={() => alert(meeting.transcript || "No transcript available")}>
-                                                <FileText className="mr-2 h-4 w-4" />
-                                                View Transcript
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => alert(meeting.summary || "No summary available")}>
-                                                <FileText className="mr-2 h-4 w-4" />
-                                                View Summary
-                                            </Button>
-                                        </>
+                                        <Button variant="outline" size="sm" onClick={() => {
+                                            setSelectedMeeting(meeting);
+                                            setIsDetailsOpen(true);
+                                        }}>
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            View Details
+                                        </Button>
                                     )}
                                 </div>
                             </CardContent>
@@ -189,6 +190,12 @@ export default function MyMeetingsPage() {
                     ))}
                 </div>
             )}
+
+            <MeetingDetails
+                meeting={selectedMeeting}
+                isOpen={isDetailsOpen}
+                onClose={() => setIsDetailsOpen(false)}
+            />
 
             {/* Add Notetaker Modal */}
             {showAddModal && (
