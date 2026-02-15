@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { prisma } from "@notemind/db";
+import { User, Meeting } from "@notemind/db";
 import { oauth2Client } from "../../config/auth";
 import { google } from "googleapis";
 
@@ -15,7 +15,7 @@ router.post("/sync", async (req, res) => {
     }
 
     try {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await User.findById(userId);
         if (!user || !user.googleRefreshToken) {
             return res.status(401).json({ error: "User not connected to Google Calendar" });
         }
@@ -51,24 +51,19 @@ router.post("/sync", async (req, res) => {
 
                 if (startTime) {
                     // Upsert Meeting
-                    const meeting = await prisma.meeting.upsert({
-                        where: { googleEventId: event.id! },
-                        update: {
-                            startTime,
-                            endTime,
-                            title: event.summary || "Untitled Meeting",
-                            joinUrl
-                        },
-                        create: {
+                    const meeting = await Meeting.findOneAndUpdate(
+                        { googleEventId: event.id! },
+                        {
                             userId: user.id,
                             googleEventId: event.id!,
                             title: event.summary || "Untitled Meeting",
                             startTime,
                             endTime,
                             joinUrl,
-                            status: "SCHEDULED"
-                        }
-                    });
+                            // status: "SCHEDULED" // Don't overwrite status if it exists
+                        },
+                        { new: true, upsert: true, setDefaultsOnInsert: true }
+                    );
                     syncedMeetings.push(meeting);
                 }
             }

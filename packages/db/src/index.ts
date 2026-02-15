@@ -1,11 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import connectDB from './connect';
+export * from './models/User';
+export * from './models/Meeting';
+export * from './models/Recording';
 
-declare global {
-    var prisma: PrismaClient | undefined;
-}
-
-export const prisma = global.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
-
-export * from '@prisma/client';
+export { connectDB };

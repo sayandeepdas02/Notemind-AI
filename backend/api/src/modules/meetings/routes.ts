@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { prisma } from "@notemind/db";
+import { Meeting } from "@notemind/db";
 import { authenticateToken, AuthRequest } from "../../middleware/auth";
 import { meetingQueue } from "../../transcription/queue";
 
@@ -8,10 +8,7 @@ const router: Router = express.Router();
 // GET /meetings - List user's meetings
 router.get("/", authenticateToken, async (req: AuthRequest, res) => {
     try {
-        const meetings = await prisma.meeting.findMany({
-            where: { userId: req.userId },
-            orderBy: { startTime: "desc" }
-        });
+        const meetings = await Meeting.find({ userId: req.userId }).sort({ startTime: -1 });
 
         res.json({ meetings });
     } catch (error) {
@@ -35,14 +32,12 @@ router.post("/", authenticateToken, async (req: AuthRequest, res) => {
     }
 
     try {
-        const meeting = await prisma.meeting.create({
-            data: {
-                userId: req.userId!,
-                joinUrl: meetingUrl,
-                title: title || "Untitled Meeting",
-                startTime: new Date(),
-                status: "PENDING" // Initial status
-            }
+        const meeting = await Meeting.create({
+            userId: req.userId!,
+            joinUrl: meetingUrl,
+            title: title || "Untitled Meeting",
+            startTime: new Date(),
+            status: "PENDING" // Initial status
         });
 
         // Add to queue
@@ -66,11 +61,9 @@ router.get("/:id", authenticateToken, async (req: AuthRequest, res) => {
     const { id } = req.params;
 
     try {
-        const meeting = await prisma.meeting.findFirst({
-            where: {
-                id,
-                userId: req.userId
-            },
+        const meeting = await Meeting.findOne({
+            _id: id,
+            userId: req.userId
         });
 
         if (!meeting) {

@@ -1,10 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { Queue } from "bullmq";
-import { prisma } from "@notemind/db";
+import { connectDB } from "@notemind/db";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+// Connect to MongoDB
+connectDB(process.env.DATABASE_URL || "mongodb://localhost:27017/notemind");
 
 // Initialize BullMQ Queue
 const meetingQueue = new Queue("meeting-jobs", {
@@ -39,11 +42,12 @@ app.post("/meetings/join", async (req, res) => {
 
     try {
         // 1. Create Meeting in DB (Simulated User ID for MVP)
-        const user = await prisma.user.findFirst();
+        const { User } = require("@notemind/db"); // Dynamic import to avoid circular dependency issues if any
+        let user = await User.findOne();
         if (!user) {
             // Create dummy user if none exists for testing
-            await prisma.user.create({
-                data: { email: "test@example.com", name: "Test User" }
+            user = await User.create({
+                email: "test@example.com", name: "Test User"
             });
         }
 

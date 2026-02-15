@@ -1,8 +1,11 @@
 import { Worker } from "bullmq";
-import { prisma } from "@notemind/db";
+import { Meeting, connectDB } from "@notemind/db";
 import IORedis from "ioredis";
 
 console.log("Bot Service Starting...");
+
+// Connect to MongoDB
+connectDB(process.env.DATABASE_URL || "mongodb://localhost:27017/notemind");
 
 const connection = new IORedis(process.env.REDIS_URL || "redis://localhost:6379", {
     maxRetriesPerRequest: null,
@@ -16,10 +19,7 @@ const worker = new Worker(
 
         try {
             // 1. Update status to RUNNING
-            await prisma.meeting.update({
-                where: { id: meetingId },
-                data: { status: "RUNNING" }
-            });
+            await Meeting.findByIdAndUpdate(meetingId, { status: "RUNNING" });
             console.log(`[Bot] Meeting ${meetingId} status -> RUNNING`);
 
             // 2. Simulate Bot Work
@@ -37,13 +37,10 @@ Speaker 1: Awesome work. Meeting adjourned.
             const mockSummary = "The team discussed the frontend progress. The dashboard is now responsive and API integrated.";
 
             // 3. Save Results & Complete
-            await prisma.meeting.update({
-                where: { id: meetingId },
-                data: {
-                    status: "COMPLETED",
-                    transcript: mockTranscript,
-                    summary: mockSummary
-                }
+            await Meeting.findByIdAndUpdate(meetingId, {
+                status: "COMPLETED",
+                transcript: mockTranscript,
+                summary: mockSummary
             });
             console.log(`[Bot] Meeting ${meetingId} status -> COMPLETED`);
 
@@ -52,10 +49,7 @@ Speaker 1: Awesome work. Meeting adjourned.
         } catch (error: any) {
             console.error(`[Bot] Job failed for meeting ${meetingId}`, error);
 
-            await prisma.meeting.update({
-                where: { id: meetingId },
-                data: { status: "FAILED" }
-            });
+            await Meeting.findByIdAndUpdate(meetingId, { status: "FAILED" });
 
             throw error;
         }

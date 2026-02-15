@@ -9,12 +9,11 @@
         "generate": "prisma generate",
         "push": "prisma db push"
     },
-    "dependencies": {
-        "@prisma/client": "^5.0.0"
-    },
     "devDependencies": {
         "@notemind/config": "workspace:*",
-        "@types/node": "^20.0.0",
-        "prisma": "^5.0.0"
+        "@types/node": "^20.0.0"
+    },
+    "dependencies": {
+        "mongoose": "^9.2.1"
     }
 }

@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { prisma } from "@notemind/db";
+import { User } from "@notemind/db";
 import bcrypt from "bcryptjs";
 import { authenticateToken, generateToken, AuthRequest } from "../../middleware/auth";
 import { oauth2Client, SCOPES } from "../../config/auth";
@@ -41,23 +41,19 @@ router.get("/google/callback", async (req, res) => {
         const googleRefreshToken = tokens.refresh_token;
 
         // Find or Create User
-        let user = await prisma.user.findUnique({ where: { email } });
+        let user = await User.findOne({ email });
 
         if (!user) {
             // Create user
-            user = await prisma.user.create({
-                data: {
-                    email,
-                    name,
-                    googleRefreshToken // Store refresh token
-                }
+            user = await User.create({
+                email,
+                name,
+                googleRefreshToken: googleRefreshToken || undefined // Store refresh token
             });
         } else if (googleRefreshToken) {
             // Update refresh token if we got a new one
-            user = await prisma.user.update({
-                where: { id: user.id },
-                data: { googleRefreshToken }
-            });
+            user.googleRefreshToken = googleRefreshToken;
+            await user.save();
         }
 
         // Generate JWT
@@ -84,18 +80,16 @@ router.post("/signup", async (req, res) => {
     }
 
     try {
-        const existingUser = await prisma.user.findUnique({ where: { email } });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: "User already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                name: name || "User",
-            },
+        const user = await User.create({
+            email,
+            password: hashedPassword,
+            name: name || "User",
         });
 
         const token = generateToken(user.id, user.email);
@@ -115,7 +109,7 @@ router.post("/signin", async (req, res) => {
     }
 
     try {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await User.findOne({ email });
         if (!user || !user.password) {
             return res.status(401).json({ error: "Invalid credentials" });
         }
@@ -136,10 +130,7 @@ router.post("/signin", async (req, res) => {
 // GET /auth/me - Get current user
 router.get("/me", authenticateToken, async (req: AuthRequest, res) => {
     try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.userId },
-            select: { id: true, email: true, name: true, createdAt: true }
-        });
+        const user = await User.findById(req.userId).select("id email name createdAt");
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -165,7 +156,7 @@ router.put("/password", authenticateToken, async (req: AuthRequest, res) => {
     }
 
     try {
-        const user = await prisma.user.findUnique({ where: { id: req.userId } });
+        const user = await User.findById(req.userId);
         if (!user || !user.password) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -176,10 +167,8 @@ router.put("/password", authenticateToken, async (req: AuthRequest, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await prisma.user.update({
-            where: { id: req.userId },
-            data: { password: hashedPassword }
-        });
+        user.password = hashedPassword;
+        await user.save();
 
         res.json({ message: "Password updated successfully" });
     } catch (error) {
