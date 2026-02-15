@@ -2,13 +2,16 @@
   "name": "notemind-monorepo",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "build": "pnpm -r run build",
+    "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:web\" \"pnpm run dev:bot\"",
+    "dev:api": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:bot": "pnpm --filter bot dev",
+    "lint": "pnpm -r run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
+    "concurrently": "^9.2.1",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0"
   },
